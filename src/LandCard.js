@@ -7,6 +7,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
+import Button from '@material-ui/core/Button';
 
 const faces = [
   "http://i.pravatar.cc/300?img=1",
@@ -50,7 +51,56 @@ const styles = muiBaseTheme => ({
   }
 });
 
+
 class LandCard extends Component{
+ 
+  handleBuy =async () => {
+    try{
+      //console.log("web3_addLand", this.props.web3)
+      //let accounts = await this.state.web3.eth.getAccounts()
+      console.log('val: ',Number(this.props.land.cost)* (10**18))
+      let accounts = await this.props.web3.eth.getAccounts()
+      /*await this.props.ltInstance.methods.visited(this.props.tokenId)
+      .send({from: accounts[0]})  
+      .once('receipt', (receipt) => {
+        this.setState({loading: false});
+        this.props.lands.push({owner: this.state.address, location: this.state.location, cost: this.state.cost});
+        console.log("SUCCESS");
+      })*/
+      console.log('ACC',accounts[0]);
+      console.log('tok',this.props.tokenId);
+    await this.props.ltInstance.methods.buyLand(Number(this.props.tokenId))
+    .send({from: accounts[0], value: Number(this.props.land.cost)* (10**18)})  
+    }
+    catch(error)
+    {
+      console.log("submit",error);
+      console.log("msg",error.message);
+    }
+  };
+
+  handleVisit =async () => {
+    try{
+      //console.log("web3_addLand", this.props.web3)
+      //let accounts = await this.state.web3.eth.getAccounts()
+      console.log('val: ',Number(this.props.land.cost)* (10**18))
+      let accounts = await this.props.web3.eth.getAccounts()
+      await this.props.ltInstance.methods.visited(this.props.tokenId)
+      .send({from: accounts[0]})  
+      .once('receipt', (receipt) => {
+        this.setState({loading: false});
+        this.props.lands.push({owner: this.state.address, location: this.state.location, cost: this.state.cost});
+        console.log("SUCCESS");
+      })
+      
+    }
+    catch(error)
+    {
+      console.log("submit",error);
+    }
+  };
+
+
   render(){
     const { classes } = this.props;
     return(
@@ -68,9 +118,61 @@ class LandCard extends Component{
               variant={"h6"}
               gutterBottom
             >
-              Nature Around Us
+              Owner: {this.props.land.owner}
             </Typography>
             <Typography
+              className={"MuiTypography--heading"}
+              variant={"h6"}
+              gutterBottom
+            >
+              Location: {this.props.land.location}
+            </Typography>
+
+            <Divider className={classes.divider} light />
+            
+            <Typography
+              className={"MuiTypography--heading"}
+              variant={"h6"}
+              gutterBottom
+            >
+              Cost: {this.props.land.cost}
+            </Typography>
+
+            <Divider className={classes.divider} light />
+            {this.props.menu!=='Purchased Lands' &&
+            <Button
+              type="submit"
+              
+              variant="contained"
+              color="primary"
+              
+              onClick={this.handleBuy}
+            >
+              Buy Land
+            </Button>}
+            {this.props.menu!=='Purchased Lands' &&
+            <Button
+              type="submit"
+              style={{float:'right'}}
+              variant="contained"
+              color="primary"
+              
+              onClick={this.handleVisit}
+            >
+              Visit Land
+            </Button>}
+            <div>
+              <Typography
+                className={"MuiTypography--subheading"}
+                variant={"caption"}
+                gutterBottom
+              >
+                Some additional description about the land
+              </Typography>
+            </div>
+            
+
+            {/*<Typography
               className={"MuiTypography--subheading"}
               variant={"caption"}
             >
@@ -80,7 +182,7 @@ class LandCard extends Component{
             <Divider className={classes.divider} light />
             {faces.map(face => (
               <Avatar className={classes.avatar} key={face} src={face} />
-            ))}
+            ))}*/}
           </CardContent>
         </Card>
 
